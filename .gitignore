@@ -1,0 +1,15 @@
+# Build outputs and generated files
+sel4-venv/
+.venv/
+__pycache__/
+*.o
+*.a
+*.so
+*.img
+*.log
+
+# Allow source files in build/ but ignore CMake outputs if build/ is used as working dir
+/build/*
+!/build/setup-dev-env.sh
+!/build/toolchain-x86.cmake
+!/build/toolchain-arm.cmake
