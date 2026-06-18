@@ -39,6 +39,7 @@ jobs:
       run: |
         chmod +x ./build/setup-dev-env.sh
         ./build/setup-dev-env.sh --arch=${{ matrix.arch }}
+        echo "$HOME/.bin" >> $GITHUB_PATH
         
         # Fix permissions for the cache action to avoid tar exit code 2
         sudo chown -R $USER:$USER /var/cache/apt/archives
