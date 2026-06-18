@@ -1,0 +1,13 @@
+import <std_connector.camkes>;
+
+component Hello {
+    control;
+}
+
+assembly {
+    composition {
+        component Hello hello;
+    }
+    configuration {
+    }
+}
