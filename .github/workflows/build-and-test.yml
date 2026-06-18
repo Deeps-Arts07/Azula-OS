@@ -76,6 +76,7 @@ jobs:
         else
           ../init-build.sh -DCAMKES_APP=AzulaOS -DPLATFORM=qemu-arm-virt -DAARCH64=1 -DSIMULATION=TRUE
         fi
+        export PATH="$PWD/capDL-tool:$PATH"
         ninja
 
     - name: Test Output (QEMU)
