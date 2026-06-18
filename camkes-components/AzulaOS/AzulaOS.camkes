@@ -1,0 +1,26 @@
+import <std_connector.camkes>;
+import "../interfaces/Init.idl4";
+
+import "../BusyBox/BusyBox.camkes";
+import "../drivers/Framebuffer/Framebuffer.camkes";
+import "../drivers/USB/USB.camkes";
+import "../AzulaInit/AzulaInit.camkes";
+
+assembly {
+    composition {
+        component AzulaInit init;
+        component Framebuffer fb;
+        component USB usb;
+        component BusyBox shell;
+
+        connection seL4RPCCall init_fb(from init.fb_init, to fb.init);
+        connection seL4RPCCall init_usb(from init.usb_init, to usb.init);
+        connection seL4RPCCall init_shell(from init.shell_init, to shell.init);
+    }
+    configuration {
+        fb.init_priority = 100;
+        usb.init_priority = 100;
+        shell.init_priority = 100;
+        init.init_priority = 90; // Runs later or lower priority to sequence them
+    }
+}

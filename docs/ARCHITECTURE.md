@@ -7,7 +7,7 @@ Azula OS is a lightweight, privacy-first operating system designed with a harden
 Azula OS avoids the monolithic Linux kernel entirely. It is built as a set of isolated capability-based components (CAmkES) running on seL4.
 
 ### Layer 1: seL4 Microkernel
-- Unmodified, formally verified microkernel.
+- Unmodified, formally verified microkernel (Phase 1 complete).
 - Enforces strict capability-based access control.
 - CAmkES is used as the component architecture to define statically-configured IPC communication between user-level daemons.
 

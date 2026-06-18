@@ -1,0 +1,9 @@
+import <std_connector.camkes>;
+import "../interfaces/Init.idl4";
+
+component AzulaInit {
+    control;
+    uses Init fb_init;
+    uses Init usb_init;
+    uses Init shell_init;
+}

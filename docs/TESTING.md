@@ -10,28 +10,27 @@ Run the setup script inside a WSL2 or Debian/Ubuntu environment:
 source sel4-venv/bin/activate
 ```
 
-## Phase 1: Booting "Hello World"
+## Phase 1: Booting "Hello World" (Complete)
 
-*(Instructions will be updated as the build system is finalized)*
+Phase 1 successfully implemented an unmodified seL4 microkernel booting a minimal CAmkES component that prints "hello world" over the serial console on both x86-64 and ARM AArch64.
 
-### Building for x86-64
+### Building and Testing Locally
+The build process relies on the Google `repo` tool. The CI automatically fetches the required dependencies. To run locally:
 ```bash
-# To be populated
-```
-
-### Running in QEMU (x86-64)
-```bash
-qemu-system-x86_64 -m 512 -nographic -kernel <path_to_image>
-```
-
-### Building for ARM AArch64
-```bash
-# To be populated
-```
-
-### Running in QEMU (ARM AArch64)
-```bash
-qemu-system-aarch64 -machine virt -cpu cortex-a57 -m 512 -nographic -kernel <path_to_image>
+./build/setup-dev-env.sh
+source sel4-venv/bin/activate
+mkdir workspace && cd workspace
+repo init -u https://github.com/seL4/camkes-manifest.git
+repo sync
+rm -rf kernel && ln -s ../kernel ./kernel
+mkdir -p projects/camkes/apps && ln -s ../../../../camkes-components/HelloWorld projects/camkes/apps/HelloWorld
+mkdir build && cd build
+# For x86:
+../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=pc99 -DSIMULATION=TRUE
+# For ARM AArch64:
+../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=qemu-arm-virt -DAARCH64=1 -DSIMULATION=TRUE
+ninja
+./simulate
 ```
 
 ## Automated Testing (CI)
