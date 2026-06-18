@@ -15,12 +15,12 @@ jobs:
     
     steps:
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: recursive
 
     - name: Cache APT Packages
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: /var/cache/apt/archives
         key: apt-cache-${{ runner.os }}-${{ matrix.arch }}-${{ hashFiles('build/setup-dev-env.sh') }}
@@ -28,7 +28,7 @@ jobs:
           apt-cache-${{ runner.os }}-${{ matrix.arch }}-
 
     - name: Cache Python Virtual Environment
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: sel4-venv
         key: venv-${{ runner.os }}-${{ hashFiles('build/setup-dev-env.sh') }}
@@ -40,24 +40,57 @@ jobs:
         chmod +x ./build/setup-dev-env.sh
         ./build/setup-dev-env.sh --arch=${{ matrix.arch }}
         
-    # Note: A complete build usually requires checking out seL4 libraries via `repo` tool.
-    # This section will be expanded once the exact manifest approach is configured.
-    - name: Build (Mock/Placeholder)
+        # Fix permissions for the cache action to avoid tar exit code 2
+        sudo chown -R $USER:$USER /var/cache/apt/archives
+        sudo rm -f /var/cache/apt/archives/lock || true
+
+    - name: Initialize seL4 Workspace
+      run: |
+        mkdir -p workspace
+        cd workspace
+        repo init -u https://github.com/seL4/camkes-manifest.git
+        repo sync
+        
+        # Inject our custom kernel and components into the manifest workspace
+        rm -rf kernel
+        ln -s ../kernel ./kernel
+        
+        mkdir -p projects/camkes/apps
+        ln -s ../../../../camkes-components/HelloWorld projects/camkes/apps/HelloWorld
+
+    - name: Build Phase 1 Image
       run: |
         source sel4-venv/bin/activate
-        echo "mkdir build && cd build"
+        cd workspace
+        mkdir build
+        cd build
         if [ "${{ matrix.arch }}" == "x86" ]; then
-          echo "cmake -DCMAKE_TOOLCHAIN_FILE=../build/toolchain-x86.cmake -G Ninja .."
+          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=pc99
         else
-          echo "cmake -DCMAKE_TOOLCHAIN_FILE=../build/toolchain-arm.cmake -G Ninja .."
+          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=qemu-arm-virt -DAARCH64=1
         fi
-        echo "ninja"
-        
+        ninja
+
     - name: Test Output (QEMU)
       run: |
-        # Placeholder for actual QEMU run and string assertion
-        # qemu-system-${{ matrix.arch }} ... > serial_output.log
-        # grep "hello world" serial_output.log
-        echo "hello world" > serial_output.log
-        grep "hello world" serial_output.log
-        echo "Test passed!"
+        cd workspace/build
+        
+        # The build system generates a ./simulate script with the correct QEMU args
+        ./simulate > serial_output.log &
+        QEMU_PID=$!
+        
+        # Wait up to 60 seconds for the boot sequence to complete and print our string
+        for i in {1..60}; do
+          if grep -q "hello world" serial_output.log; then
+            echo "Success: Found 'hello world' in serial output!"
+            kill $QEMU_PID || true
+            exit 0
+          fi
+          sleep 1
+        done
+        
+        echo "Error: Did not find 'hello world' in serial output."
+        echo "=== Serial Output ==="
+        cat serial_output.log
+        kill $QEMU_PID || true
+        exit 1
