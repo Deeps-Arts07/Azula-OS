@@ -30,13 +30,15 @@ assembly {
         connection seL4RPCCall init_shell(from init.shell_init, to shell.init);
 
 #if defined(__x86_64__) || defined(__i386__)
-        component PCIConfigPorts pci_port;
-        connection seL4HardwareIOPort fb_pci_conn(from fb.pci_port, to pci_port.ports);
-        connection seL4HardwareIOPort usb_pci_conn(from usb.pci_port, to pci_port.ports);
+        component PCIConfigPorts pci_port_fb;
+        component PCIConfigPorts pci_port_usb;
+        connection seL4HardwareIOPort fb_pci_conn(from fb.pci_port, to pci_port_fb.ports);
+        connection seL4HardwareIOPort usb_pci_conn(from usb.pci_port, to pci_port_usb.ports);
 #elif defined(__aarch64__) || defined(__arm__)
-        component PCIEcamMem pci_mmio;
-        connection seL4HardwareMMIO fb_pci_conn(from fb.pci_mmio, to pci_mmio.mem);
-        connection seL4HardwareMMIO usb_pci_conn(from usb.pci_mmio, to pci_mmio.mem);
+        component PCIEcamMem pci_mmio_fb;
+        component PCIEcamMem pci_mmio_usb;
+        connection seL4HardwareMMIO fb_pci_conn(from fb.pci_mmio, to pci_mmio_fb.mem);
+        connection seL4HardwareMMIO usb_pci_conn(from usb.pci_mmio, to pci_mmio_usb.mem);
 #endif
     }
     configuration {
@@ -46,10 +48,13 @@ assembly {
         init.init_priority = 90; // Runs later or lower priority to sequence them
 
 #if defined(__x86_64__) || defined(__i386__)
-        pci_port.ports_attributes = "0xCF8:0xCFF";
+        pci_port_fb.ports_attributes = "0xCF8:0xCFF";
+        pci_port_usb.ports_attributes = "0xCF8:0xCFF";
 #elif defined(__aarch64__) || defined(__arm__)
-        pci_mmio.mem_paddr = 0x4010000000;
-        pci_mmio.mem_size = 0x1000000; // 16MB for bus 0
+        pci_mmio_fb.mem_paddr = 0x4010000000;
+        pci_mmio_fb.mem_size = 0x1000000; // 16MB for bus 0
+        pci_mmio_usb.mem_paddr = 0x4010000000;
+        pci_mmio_usb.mem_size = 0x1000000;
 #endif
     }
 }
