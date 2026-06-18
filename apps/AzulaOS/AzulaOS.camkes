@@ -1,10 +1,10 @@
 import <std_connector.camkes>;
-import "Init.idl4";
+import "../../../../camkes-components/interfaces/Init.idl4";
 
-import "BusyBox/BusyBox.camkes";
-import "drivers/Framebuffer/Framebuffer.camkes";
-import "drivers/USB/USB.camkes";
-import "AzulaInit/AzulaInit.camkes";
+import "../../../../camkes-components/BusyBox/BusyBox.camkes";
+import "../../../../camkes-components/drivers/Framebuffer/Framebuffer.camkes";
+import "../../../../camkes-components/drivers/USB/USB.camkes";
+import "../../../../camkes-components/AzulaInit/AzulaInit.camkes";
 
 assembly {
     composition {
