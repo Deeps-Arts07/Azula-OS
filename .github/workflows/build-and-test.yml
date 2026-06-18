@@ -10,6 +10,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         arch: [x86, arm]
     
@@ -66,9 +67,9 @@ jobs:
         mkdir build
         cd build
         if [ "${{ matrix.arch }}" == "x86" ]; then
-          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=pc99
+          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=pc99 -DSIMULATION=TRUE
         else
-          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=qemu-arm-virt -DAARCH64=1
+          ../init-build.sh -DCAMKES_APP=HelloWorld -DPLATFORM=qemu-arm-virt -DAARCH64=1 -DSIMULATION=TRUE
         fi
         ninja
 
