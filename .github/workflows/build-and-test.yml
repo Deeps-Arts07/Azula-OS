@@ -57,9 +57,12 @@ jobs:
         rm -rf kernel
         ln -s ../kernel ./kernel
         
-        mkdir -p projects/camkes/apps
-        # Copy the entire camkes-components directory so relative paths work perfectly
-        cp -R ../camkes-components projects/camkes/apps/
+        mkdir -p projects/camkes/apps/AzulaOS
+        # Copy the AzulaOS root assembly
+        cp -R ../apps/AzulaOS/* projects/camkes/apps/AzulaOS/
+        
+        # Copy the camkes-components directory so relative paths work
+        cp -R ../camkes-components ./
 
 
     - name: Build Phase 2 Image
@@ -69,9 +72,9 @@ jobs:
         mkdir build
         cd build
         if [ "${{ matrix.arch }}" == "x86" ]; then
-          ../init-build.sh -DCAMKES_APP=camkes-components/AzulaOS -DPLATFORM=pc99 -DSIMULATION=TRUE
+          ../init-build.sh -DCAMKES_APP=AzulaOS -DPLATFORM=pc99 -DSIMULATION=TRUE
         else
-          ../init-build.sh -DCAMKES_APP=camkes-components/AzulaOS -DPLATFORM=qemu-arm-virt -DAARCH64=1 -DSIMULATION=TRUE
+          ../init-build.sh -DCAMKES_APP=AzulaOS -DPLATFORM=qemu-arm-virt -DAARCH64=1 -DSIMULATION=TRUE
         fi
         ninja
 
