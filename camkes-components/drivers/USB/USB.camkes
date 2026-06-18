@@ -3,4 +3,10 @@ import "../../interfaces/Init.idl4";
 
 component USB {
     provides Init init;
+
+#if defined(__x86_64__) || defined(__i386__)
+    uses IOPort pci_port;
+#elif defined(__aarch64__) || defined(__arm__)
+    dataport Buf(16777216) pci_mmio;
+#endif
 }
