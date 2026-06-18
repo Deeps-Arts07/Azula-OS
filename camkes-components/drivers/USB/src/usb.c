@@ -3,8 +3,6 @@
 #include <camkes.h>
 
 #if defined(__x86_64__) || defined(__i386__)
-extern uint32_t pci_port_in32(uint16_t port);
-extern void pci_port_out32(uint16_t port, uint32_t val);
 
 #define PCI_CONFIG_ADDRESS 0xCF8
 #define PCI_CONFIG_DATA    0xCFC
@@ -15,7 +13,6 @@ static uint32_t pci_read(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset
     return pci_port_in32(PCI_CONFIG_DATA);
 }
 #elif defined(__aarch64__) || defined(__arm__)
-extern volatile void *pci_mmio;
 
 static uint32_t pci_read(uint8_t bus, uint8_t slot, uint8_t func, uint8_t offset) {
     uint32_t ecam_offset = (bus << 20) | (slot << 15) | (func << 12) | (offset & 0xFC);
