@@ -1,5 +1,5 @@
 import <std_connector.camkes>;
-import "../interfaces/Init.idl4";
+import "../../interfaces/Init.idl4";
 
 component USB {
     provides Init init;
