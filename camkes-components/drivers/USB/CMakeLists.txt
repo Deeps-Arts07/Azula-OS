@@ -1,5 +1,5 @@
 set(USB_sources src/usb.c)
-set(USB_LIBS muslc sel4muslcsys sel4vfs)
+set(USB_LIBS muslc sel4muslcsys)
 DeclareCAmkESComponent(
     USB
     SOURCES ${USB_sources}

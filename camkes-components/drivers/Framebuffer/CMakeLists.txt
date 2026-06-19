@@ -1,5 +1,5 @@
 set(Framebuffer_sources src/fb.c)
-set(Framebuffer_LIBS muslc sel4muslcsys sel4vfs)
+set(Framebuffer_LIBS muslc sel4muslcsys)
 DeclareCAmkESComponent(
     Framebuffer
     SOURCES ${Framebuffer_sources}
